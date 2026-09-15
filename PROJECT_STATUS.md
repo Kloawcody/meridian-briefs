@@ -23,13 +23,14 @@ Updated: 2026-09-15
 - E2E verified locally (checkout → generate → kit download → questions → owner inbox)
 - Pushed to GitHub: https://github.com/Kloawcody/meridian-briefs
 - Feature branch: `cursor/automated-meridian-briefs-ecdb`
-- Temporary public Vercel deploy verified (claim link in README if still active)
-- Team project `meridian-briefs-live` created; may need auth disabled in Vercel dashboard
+- Serverless storage fix pushed (`tmpdir` + memory + sessionStorage fallback)
+- Public demo URL verified generate API returns kits: https://temporary-fast-ruby-pgr5goj.vercel.app
+- Claim deploy to keep it: https://vercel.com/claim-deployment?code=0591db9f-b63d-4379-83bf-1aeb0f6bb4f3
 
 ## Current state
-- Business software is complete in demo mode
-- To take real money: add Stripe + OpenAI + Resend env vars (see SETUP.md)
-- Stripe/Resend MCP auth requires Cursor desktop
+- Business software complete in demo mode
+- To take real money: add Stripe + OpenAI + Resend (SETUP.md) and claim/import the Vercel project
+- Your ongoing role: design taste + `/owner` questions only
 
 ## Owner role
 - Design refinements only

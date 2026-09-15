@@ -40,7 +40,14 @@ Webhook endpoint: `POST /api/webhook`
 
 ## Deploy
 
-Deploy the GitHub repo to Vercel, add the env vars, point a domain, and turn on Stripe live mode.
+1. Claim or import the GitHub repo on Vercel: https://github.com/Kloawcody/meridian-briefs
+2. Add env vars from `.env.example`
+3. Turn off Vercel Authentication if you want a public storefront
+4. Point a custom domain when ready
+
+Live demo (temporary; claim to keep):
+https://temporary-fast-ruby-pgr5goj.vercel.app
+Claim: https://vercel.com/claim-deployment?code=0591db9f-b63d-4379-83bf-1aeb0f6bb4f3
 
 ## Your job
 
