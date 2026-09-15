@@ -1,52 +1,36 @@
 # Meridian Briefs
 
-Fully automated brand-brief micro-business.
+Automated brand-brief micro-business. Customers pay → short intake → kit delivered. You only handle design taste and rare questions.
 
-Customers pay → fill a short intake → Meridian generates a positioning/voice/color/copy kit → download + optional email. You only help with **design** and **questions**.
-
-## Money loop
-
-1. Landing page sells Starter ($29) / Studio ($79) / Agency ($149)
-2. Stripe Checkout collects payment (demo mode works without Stripe)
-3. Intake form captures the brief
-4. AI (or high-quality offline generator) creates the kit
-5. Delivery page + markdown download (+ Resend email when configured)
-6. `/ask` routes exceptions to you; `/owner` is your inbox
-
-## Quick start
+## See it
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000), buy a plan in demo mode, complete intake, get a kit.
+Open http://localhost:3000
 
-## Go live (real money)
+## What’s automated
 
-Copy `.env.example` to `.env.local` and set:
+1. Checkout (Stripe live, or demo mode with no keys)
+2. Intake
+3. Brand kit generation (AI if keyed, high-quality offline generator otherwise)
+4. Kit page + markdown download
+5. Optional email delivery (Resend)
+6. Customer questions → `/owner` inbox
 
-| Variable | Purpose |
-|---|---|
-| `STRIPE_SECRET_KEY` | Live/test Stripe payments |
-| `STRIPE_WEBHOOK_SECRET` | Confirm paid sessions |
-| `NEXT_PUBLIC_APP_URL` | Public site URL |
-| `OPENAI_API_KEY` | Real AI kits (optional; demo generator works without it) |
-| `RESEND_API_KEY` + `RESEND_FROM_EMAIL` | Auto-email delivery |
-| `OWNER_EMAIL` | Where questions are forwarded |
-| `OWNER_PASSWORD` | Protect `/owner` |
+## Go live
 
-Webhook endpoint: `POST /api/webhook`
+Follow **[GO_LIVE.md](./GO_LIVE.md)** — env vars, Stripe webhook, Vercel settings, smoke test.
 
-## Deploy
-
-Deploy the GitHub repo to Vercel, add the env vars, point a domain, and turn on Stripe live mode.
+Health check: `/api/health`
 
 ## Your job
 
-- Design: tweak landing typography, hero atmosphere, pricing copy
-- Questions: answer `/owner` inbox items
-- Everything else is automated
+- Design refinements on the landing page
+- Answer `/owner` when something needs a human
+- Send traffic to the site
 
 ## Repo
 
