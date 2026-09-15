@@ -19,10 +19,17 @@ Updated: 2026-09-15
 - Pricing, how-it-works, motion accents
 - Docs: README, SETUP, this status file
 
+## Batch 4 — Ship
+- E2E verified locally (checkout → generate → kit download → questions → owner inbox)
+- Pushed to GitHub: https://github.com/Kloawcody/meridian-briefs
+- Feature branch: `cursor/automated-meridian-briefs-ecdb`
+- Temporary public Vercel deploy verified (claim link in README if still active)
+- Team project `meridian-briefs-live` created; may need auth disabled in Vercel dashboard
+
 ## Current state
-- Local product runnable in demo mode without external keys
-- Stripe/Resend MCP auth unavailable in this cloud environment (needs Cursor desktop auth or manual env vars)
-- Next: build verification, git push, Vercel deploy
+- Business software is complete in demo mode
+- To take real money: add Stripe + OpenAI + Resend env vars (see SETUP.md)
+- Stripe/Resend MCP auth requires Cursor desktop
 
 ## Owner role
 - Design refinements only

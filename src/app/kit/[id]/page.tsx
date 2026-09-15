@@ -1,5 +1,4 @@
-import { notFound } from "next/navigation";
-import { KitView } from "@/components/KitView";
+import { KitClient } from "@/components/KitClient";
 import { getOrder } from "@/lib/store";
 
 type Props = {
@@ -9,16 +8,19 @@ type Props = {
 export default async function KitPage({ params }: Props) {
   const { id } = await params;
   const order = await getOrder(id);
-  if (!order?.kit || !order.intake) notFound();
+  const initial =
+    order?.kit && order.intake
+      ? {
+          orderId: order.id,
+          planId: order.planId,
+          businessName: order.intake.businessName,
+          kit: order.kit,
+        }
+      : null;
 
   return (
     <main className="flex-1 px-5 py-16 md:px-8 md:py-24">
-      <KitView
-        businessName={order.intake.businessName}
-        planId={order.planId}
-        kit={order.kit}
-        orderId={order.id}
-      />
+      <KitClient id={id} initial={initial} />
     </main>
   );
 }
