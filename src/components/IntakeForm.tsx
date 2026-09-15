@@ -99,40 +99,49 @@ export function IntakeForm({ planId, sessionId, orderId, demo, defaultEmail }: P
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--sea)]">
           Step {step + 1} of {groups.length}
         </p>
-        <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl text-[var(--ink)]">{current.title}</h2>
+        <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">{current.title}</h2>
         <p className="mt-1 text-sm text-[var(--muted)]">{current.blurb}</p>
       </div>
 
-      {visibleFields.map((field) => (
-        <label key={field.name} className="grid gap-2 text-sm">
-          <span className="text-[var(--ink)]">{field.label}</span>
+      {/* Keep all fields mounted so FormData still includes previous steps */}
+      {fields.map((field) => (
+        <label
+          key={field.name}
+          className={`grid gap-2 text-sm text-[var(--muted)] ${field.group === current.id ? "" : "hidden"}`}
+        >
+          {field.label}
           <input
             name={field.name}
-            type={getattr := getattr if False else ("email" if field.name == "email" else "text")) or "text"}
-            required={"required" not in field or field.required is not False}
-            defaultValue={field.name == "email" ? defaultEmail || "" : ""}
+            required={"required" in field ? field.required !== false : true}
+            type={"type" in field ? field.type : "text"}
+            defaultValue={field.name === "email" ? defaultEmail : undefined}
             placeholder={field.placeholder}
-            className="rounded-sm border border-[var(--line)] bg-white px-3 py-2.5 outline-none ring-[var(--sea)] focus:ring-2"
+            className="rounded-sm border border-[var(--line)] bg-white px-3 py-3 text-[var(--ink)] outline-none ring-[var(--sea)] focus:ring-2"
           />
         </label>
       ))}
 
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
 
-      <div className="flex gap-3">
+      <div className="mt-2 flex flex-wrap gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="rounded-sm border border-[var(--line)] px-4 py-2.5 text-sm">
+          <button
+            type="button"
+            onClick={() => setStep((s) => s - 1)}
+            className="rounded-sm border border-[var(--line)] px-5 py-3 text-sm text-[var(--ink)]"
+          >
             Back
           </button>
         ) : null}
         <button
           type="submit"
           disabled={loading}
-          className="rounded-sm bg-[var(--ink)] px-5 py-2.5 text-sm font-medium text-[var(--sand)] disabled:opacity-60"
+          className="rounded-sm bg-[var(--ink)] px-5 py-3 text-sm font-medium text-[var(--sand)] transition hover:bg-[var(--ink-soft)] disabled:opacity-60"
         >
-          {loading ? "Generating…" : step < groups.length - 1 ? "Continue" : "Generate kit"}
+          {loading ? "Generating your kit…" : step < groups.length - 1 ? "Continue" : "Generate my Meridian kit"}
         </button>
       </div>
+      <p className="text-xs text-[var(--muted)]">{visibleFields.length} fields in this step</p>
     </form>
   );
 }
