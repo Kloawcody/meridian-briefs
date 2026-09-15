@@ -1,4 +1,27 @@
+"use client";
+
+import { CopyButton } from "@/components/CopyButton";
 import type { BrandKit } from "@/lib/types";
+
+function Section({
+  title,
+  children,
+  copyText,
+}: {
+  title: string;
+  children: React.ReactNode;
+  copyText?: string;
+}) {
+  return (
+    <section className="border-t border-[var(--line)] pt-8">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">{title}</h2>
+        {copyText ? <CopyButton text={copyText} /> : null}
+      </div>
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
 
 export function KitView({
   businessName,
@@ -11,117 +34,132 @@ export function KitView({
   kit: BrandKit;
   orderId: string;
 }) {
+  const voiceBlock = [
+    kit.brandVoice.summary,
+    "",
+    "Do:",
+    ...kit.brandVoice.doList.map((d) => `- ${d}`),
+    "",
+    "Don't:",
+    ...kit.brandVoice.dontList.map((d) => `- ${d}`),
+  ].join("\n");
+
   return (
-    <div className="mx-auto max-w-3xl space-y-10">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto max-w-3xl">
+      <div className="no-print mb-8 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--sea)]">Delivered automatically</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-[var(--sea)]">Meridian kit · {planId}</p>
           <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl text-[var(--ink)] md:text-5xl">
             {businessName}
           </h1>
-          <p className="mt-2 text-[var(--muted)]">Meridian {planId} kit · Order {orderId}</p>
         </div>
-        <a
-          href={`/api/kit/${orderId}/download`}
-          className="rounded-sm bg-[var(--ink)] px-4 py-3 text-sm font-medium text-[var(--sand)]"
-        >
-          Download markdown
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="rounded-sm border border-[var(--line)] px-3 py-2 text-sm text-[var(--ink)]"
+          >
+            Print
+          </button>
+          <a
+            href={`/api/kit/${orderId}/download`}
+            className="rounded-sm bg-[var(--ink)] px-3 py-2 text-sm font-medium text-[var(--sand)]"
+          >
+            Download markdown
+          </a>
+        </div>
       </div>
 
-      <section>
-        <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">Positioning</h2>
-        <p className="mt-3 text-lg leading-relaxed text-[var(--ink)]/90">{kit.positioningStatement}</p>
-      </section>
+      <Section title="Positioning" copyText={kit.positioningStatement}>
+        <p className="text-[var(--ink)]/90 leading-relaxed">{kit.positioningStatement}</p>
+      </Section>
 
-      <section>
-        <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">Taglines</h2>
-        <ul className="mt-3 space-y-2 text-[var(--ink)]/90">
+      <Section title="Taglines" copyText={kit.taglines.join("\n")}>
+        <ul className="space-y-2">
           {kit.taglines.map((t) => (
-            <li key={t}>{t}</li>
+            <li key={t} className="text-[var(--ink)]">
+              {t}
+            </li>
           ))}
         </ul>
-      </section>
+      </Section>
 
-      <section>
-        <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">Brand voice</h2>
-        <p className="mt-3 text-[var(--ink)]/90">{kit.brandVoice.summary}</p>
-        <div className="mt-4 grid gap-6 md:grid-cols-2">
+      <Section title="Brand voice" copyText={voiceBlock}>
+        <p className="text-[var(--ink)]/90">{kit.brandVoice.summary}</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
             <p className="text-xs uppercase tracking-[0.16em] text-[var(--sea)]">Do</p>
-            <ul className="mt-2 space-y-2 text-sm text-[var(--ink)]/85">
-              {kit.brandVoice.doList.map((t) => (
-                <li key={t}>{t}</li>
+            <ul className="mt-2 space-y-1 text-sm text-[var(--ink)]">
+              {kit.brandVoice.doList.map((d) => (
+                <li key={d}>{d}</li>
               ))}
             </ul>
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.16em] text-[var(--sea)]">Don&apos;t</p>
-            <ul className="mt-2 space-y-2 text-sm text-[var(--ink)]/85">
-              {kit.brandVoice.dontList.map((t) => (
-                <li key={t}>{t}</li>
+            <ul className="mt-2 space-y-1 text-sm text-[var(--ink)]">
+              {kit.brandVoice.dontList.map((d) => (
+                <li key={d}>{d}</li>
               ))}
             </ul>
           </div>
         </div>
-      </section>
+      </Section>
 
-      <section>
-        <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">Color system</h2>
-        <div className="mt-4 flex flex-wrap gap-3">
-          {[kit.colorSystem.primary, kit.colorSystem.secondary, kit.colorSystem.accent, ...kit.colorSystem.neutrals].map(
-            (c) => (
-              <div key={c} className="w-24">
-                <div className="h-16 w-full rounded-sm border border-[var(--line)]" style={{ background: c }} />
-                <p className="mt-2 break-all text-xs text-[var(--muted)]">{c}</p>
-              </div>
-            ),
-          )}
+      <Section title="Color system" copyText={[kit.colorSystem.primary, kit.colorSystem.secondary, kit.colorSystem.accent, ...kit.colorSystem.neutrals].join("\n")}>
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+          {[kit.colorSystem.primary, kit.colorSystem.secondary, kit.colorSystem.accent, ...kit.colorSystem.neutrals].map((c) => (
+            <div key={c}>
+              <div className="h-14 rounded-sm border border-[var(--line)]" style={{ background: c }} />
+              <p className="mt-1 text-xs text-[var(--muted)]">{c}</p>
+            </div>
+          ))}
         </div>
         <p className="mt-4 text-sm text-[var(--muted)]">{kit.colorSystem.rationale}</p>
-      </section>
+      </Section>
 
-      <section>
-        <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">Homepage copy</h2>
-        <p className="mt-3 font-[family-name:var(--font-display)] text-3xl text-[var(--ink)]">{kit.homepageCopy.headline}</p>
-        <p className="mt-3 text-[var(--ink)]/85">{kit.homepageCopy.subhead}</p>
-        <p className="mt-4 text-sm text-[var(--muted)]">
-          CTAs: {kit.homepageCopy.primaryCta} · {kit.homepageCopy.secondaryCta}
-        </p>
+      <Section title="Homepage copy" copyText={[kit.homepageCopy.headline, kit.homepageCopy.subhead, kit.homepageCopy.primaryCta, kit.homepageCopy.secondaryCta, kit.homepageCopy.proofLine].join("\n")}>
+        <p className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">{kit.homepageCopy.headline}</p>
+        <p className="mt-2 text-[var(--muted)]">{kit.homepageCopy.subhead}</p>
+        <p className="mt-4 text-sm text-[var(--ink)]">Primary CTA: {kit.homepageCopy.primaryCta}</p>
+        <p className="text-sm text-[var(--ink)]">Secondary CTA: {kit.homepageCopy.secondaryCta}</p>
         <p className="mt-2 text-sm text-[var(--muted)]">{kit.homepageCopy.proofLine}</p>
-      </section>
+      </Section>
 
-      <section>
-        <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">Social bios</h2>
-        <p className="mt-3 text-[var(--ink)]/90">{kit.socialBios.short}</p>
-        <p className="mt-2 text-sm text-[var(--muted)]">{kit.socialBios.long}</p>
-      </section>
+      <Section title="Social bios" copyText={`${kit.socialBios.short}\n\n${kit.socialBios.long}`}>
+        <p className="text-sm text-[var(--ink)]"><span className="text-[var(--muted)]">Short:</span> {kit.socialBios.short}</p>
+        <p className="mt-2 text-sm text-[var(--ink)]"><span className="text-[var(--muted)]">Long:</span> {kit.socialBios.long}</p>
+      </Section>
 
-      {kit.campaignAngles?.length ? (
-        <section>
-          <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">Campaign angles</h2>
-          <ul className="mt-3 space-y-2 text-[var(--ink)]/90">
-            {kit.campaignAngles.map((t) => (
-              <li key={t}>{t}</li>
+      {kit.namingDirections?.length ? (
+        <Section title="Naming directions" copyText={kit.namingDirections.join("\n")}>
+          <ul className="space-y-2 text-[var(--ink)]">
+            {kit.namingDirections.map((n) => (
+              <li key={n}>{n}</li>
             ))}
           </ul>
-        </section>
+        </Section>
+      ) : null}
+
+      {kit.campaignAngles?.length ? (
+        <Section title="Campaign angles" copyText={kit.campaignAngles.join("\n")}>
+          <ul className="space-y-2 text-[var(--ink)]">
+            {kit.campaignAngles.map((n) => (
+              <li key={n}>{n}</li>
+            ))}
+          </ul>
+        </Section>
       ) : null}
 
       {kit.objectionHandlers?.length ? (
-        <section>
-          <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">Objection handlers</h2>
-          <ul className="mt-3 space-y-2 text-[var(--ink)]/90">
-            {kit.objectionHandlers.map((t) => (
-              <li key={t}>{t}</li>
+        <Section title="Objection handlers" copyText={kit.objectionHandlers.join("\n")}>
+          <ul className="space-y-2 text-[var(--ink)]">
+            {kit.objectionHandlers.map((n) => (
+              <li key={n}>{n}</li>
             ))}
           </ul>
-        </section>
+        </Section>
       ) : null}
-
-      <p className="border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
-        Need a human tweak? <a className="text-[var(--sea)] underline" href={`/ask?orderId=${orderId}`}>Ask the owner</a> — design and edge cases only.
-      </p>
     </div>
   );
 }
