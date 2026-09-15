@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { SiteNav } from "@/components/SiteNav";
+import { SiteFooter } from "@/components/SiteFooter";
 import { getPlan } from "@/lib/plans";
 import { getStripe, isDemoMode } from "@/lib/stripe";
 import { getOrderBySession, saveOrder } from "@/lib/store";
@@ -56,24 +58,28 @@ export default async function SuccessPage({ searchParams }: Props) {
   if (email) qs.set("email", email);
 
   return (
-    <main className="flex-1 px-5 py-24 md:px-8">
-      <div className="mx-auto max-w-2xl">
-        <p className="text-xs uppercase tracking-[0.22em] text-[var(--sea)]">
-          {demo && !sessionId ? "Demo checkout complete" : "Payment received"}
-        </p>
-        <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl text-[var(--ink)] md:text-5xl">
-          Next: a 2-minute brief.
-        </h1>
-        <p className="mt-4 text-[var(--muted)]">
-          Meridian will generate the kit automatically after intake. No back-and-forth required.
-        </p>
-        <Link
-          href={`/start?${qs.toString()}`}
-          className="mt-8 inline-block rounded-sm bg-[var(--ink)] px-5 py-3 text-sm font-medium text-[var(--sand)]"
-        >
-          Continue to intake
-        </Link>
-      </div>
-    </main>
+    <>
+      <SiteNav />
+      <main className="surface-wash flex-1 px-5 py-24 md:px-8">
+        <div className="mx-auto max-w-2xl">
+          <p className="text-xs uppercase tracking-[0.22em] text-[var(--sea)]">
+            {demo && !sessionId ? "Demo checkout complete" : "Payment received"}
+          </p>
+          <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl text-[var(--ink)] md:text-5xl">
+            Next: a 2-minute brief.
+          </h1>
+          <p className="mt-4 text-[var(--muted)]">
+            Meridian generates the kit automatically after intake. No meetings. No waiting on a strategist.
+          </p>
+          <Link
+            href={`/start?${qs.toString()}`}
+            className="mt-8 inline-block rounded-sm bg-[var(--ink)] px-5 py-3 text-sm font-medium text-[var(--sand)]"
+          >
+            Continue to intake
+          </Link>
+        </div>
+      </main>
+      <SiteFooter />
+    </>
   );
 }
