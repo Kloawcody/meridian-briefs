@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 
@@ -13,10 +13,39 @@ const body = Manrope({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://meridian-briefs.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Meridian — Automated brand briefs that sell while you sleep",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Meridian — Automated brand briefs",
+    template: "%s · Meridian",
+  },
   description:
-    "A fully automated brand-brief studio. Customers pay, AI delivers positioning kits, and you only help with design and questions.",
+    "Customers pay once. Meridian delivers positioning, voice, colors, and launch copy automatically. You only handle design taste and rare questions.",
+  applicationName: "Meridian",
+  keywords: ["brand brief", "automated branding", "positioning", "startup branding", "AI brand kit"],
+  openGraph: {
+    type: "website",
+    title: "Meridian — Automated brand briefs",
+    description: "Pay once. Get a complete brand kit in minutes. Fully automated delivery.",
+    siteName: "Meridian",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Meridian — Automated brand briefs",
+    description: "Pay once. Get a complete brand kit in minutes.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0e1c19",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
