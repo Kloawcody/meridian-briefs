@@ -1,15 +1,26 @@
 import { promises as fs } from "fs";
+import os from "os";
 import path from "path";
 import type { OrderRecord, QuestionRecord } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
-const QUESTIONS_FILE = path.join(DATA_DIR, "questions.json");
+const memoryOrders = new Map<string, OrderRecord>();
+const memoryQuestions = new Map<string, QuestionRecord>();
+
+function dataDir() {
+  // Vercel/serverless project dirs are read-only; /tmp is writable per instance.
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join(os.tmpdir(), "meridian-briefs");
+  }
+  return path.join(process.cwd(), ".data");
+}
+
+const ordersFile = () => path.join(dataDir(), "orders.json");
+const questionsFile = () => path.join(dataDir(), "questions.json");
 
 type StoreShape<T> = Record<string, T>;
 
 async function ensureDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.mkdir(dataDir(), { recursive: true });
 }
 
 async function readStore<T>(file: string): Promise<StoreShape<T>> {
@@ -22,48 +33,67 @@ async function readStore<T>(file: string): Promise<StoreShape<T>> {
 }
 
 async function writeStore<T>(file: string, data: StoreShape<T>) {
-  await ensureDir();
-  await fs.writeFile(file, JSON.stringify(data, null, 2), "utf8");
+  try {
+    await ensureDir();
+    await fs.writeFile(file, JSON.stringify(data, null, 2), "utf8");
+  } catch {
+    // Memory remains the source of truth when disk is unavailable.
+  }
 }
 
 export async function saveOrder(order: OrderRecord) {
-  const store = await readStore<OrderRecord>(ORDERS_FILE);
+  memoryOrders.set(order.id, order);
+  const store = await readStore<OrderRecord>(ordersFile());
   store[order.id] = order;
-  await writeStore(ORDERS_FILE, store);
+  await writeStore(ordersFile(), store);
   return order;
 }
 
 export async function getOrder(id: string) {
-  const store = await readStore<OrderRecord>(ORDERS_FILE);
-  return store[id] ?? null;
+  if (memoryOrders.has(id)) return memoryOrders.get(id)!;
+  const store = await readStore<OrderRecord>(ordersFile());
+  const order = store[id] ?? null;
+  if (order) memoryOrders.set(id, order);
+  return order;
 }
 
 export async function getOrderBySession(sessionId: string) {
-  const store = await readStore<OrderRecord>(ORDERS_FILE);
-  return Object.values(store).find((o) => o.stripeSessionId === sessionId) ?? null;
+  for (const order of memoryOrders.values()) {
+    if (order.stripeSessionId === sessionId) return order;
+  }
+  const store = await readStore<OrderRecord>(ordersFile());
+  const order = Object.values(store).find((o) => o.stripeSessionId === sessionId) ?? null;
+  if (order) memoryOrders.set(order.id, order);
+  return order;
 }
 
 export async function listOrders() {
-  const store = await readStore<OrderRecord>(ORDERS_FILE);
+  const store = await readStore<OrderRecord>(ordersFile());
+  for (const order of memoryOrders.values()) store[order.id] = order;
   return Object.values(store).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export async function saveQuestion(question: QuestionRecord) {
-  const store = await readStore<QuestionRecord>(QUESTIONS_FILE);
+  memoryQuestions.set(question.id, question);
+  const store = await readStore<QuestionRecord>(questionsFile());
   store[question.id] = question;
-  await writeStore(QUESTIONS_FILE, store);
+  await writeStore(questionsFile(), store);
   return question;
 }
 
 export async function listQuestions() {
-  const store = await readStore<QuestionRecord>(QUESTIONS_FILE);
+  const store = await readStore<QuestionRecord>(questionsFile());
+  for (const q of memoryQuestions.values()) store[q.id] = q;
   return Object.values(store).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export async function updateQuestionStatus(id: string, status: QuestionRecord["status"]) {
-  const store = await readStore<QuestionRecord>(QUESTIONS_FILE);
-  if (!store[id]) return null;
-  store[id] = { ...store[id], status };
-  await writeStore(QUESTIONS_FILE, store);
-  return store[id];
+  const existing = memoryQuestions.get(id) ?? (await readStore<QuestionRecord>(questionsFile()))[id];
+  if (!existing) return null;
+  const updated = { ...existing, status };
+  memoryQuestions.set(id, updated);
+  const store = await readStore<QuestionRecord>(questionsFile());
+  store[id] = updated;
+  await writeStore(questionsFile(), store);
+  return updated;
 }
