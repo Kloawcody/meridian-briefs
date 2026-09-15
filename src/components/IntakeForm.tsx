@@ -20,7 +20,7 @@ const fields = [
   { name: "differentiator", label: "Differentiator", placeholder: "Field-tested bundles, not endless SKUs" },
   { name: "tone", label: "Desired tone", placeholder: "Calm, competent, outdoors-modern" },
   { name: "goals", label: "Near-term goal", placeholder: "Launch a clearer homepage before spring" },
-  { name: "constraints", label: "Constraints (optional)", placeholder: "Must avoid neon colors", required: false },
+  { name: "constraints", label: "Constraints (optional)", placeholder: "Avoid neon colors", required: false },
   { name: "email", label: "Delivery email", placeholder: "you@company.com", type: "email" },
 ] as const;
 
@@ -55,6 +55,22 @@ export function IntakeForm({ planId, sessionId, orderId, demo, defaultEmail }: P
       setError(data.error || "Generation failed");
       return;
     }
+
+    // Persist locally so kit pages work across serverless instances.
+    try {
+      sessionStorage.setItem(
+        `meridian-kit:${data.orderId}`,
+        JSON.stringify({
+          orderId: data.orderId,
+          planId: data.planId,
+          businessName: payload.businessName,
+          kit: data.kit,
+        }),
+      );
+    } catch {
+      // ignore quota errors
+    }
+
     router.push(data.kitUrl);
   }
 

@@ -36,9 +36,9 @@ Without a key, Meridian still delivers useful kits via the built-in generator so
 
 Set a strong `OWNER_PASSWORD` before sharing the site publicly.
 
-## 6. Persistence note
+## Persistence
 
-Orders/questions are stored under `.data/` on disk. On serverless hosts the filesystem is ephemeral, so for serious volume add Vercel Postgres / Blob / Redis and swap `src/lib/store.ts`. Demo and low volume still work for proving the model.
+Orders/questions use in-memory storage plus `/tmp` on serverless (Vercel). For durable production volume, replace `src/lib/store.ts` with Postgres/Blob/Redis. Kits are also cached in the browser `sessionStorage` after generation so delivery works across instances.
 
 ## 7. Traffic
 
