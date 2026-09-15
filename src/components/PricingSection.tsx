@@ -10,12 +10,14 @@ async function startCheckout(plan: Plan, email?: string) {
     body: JSON.stringify({ planId: plan.id, email }),
   });
   const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Checkout failed");
   if (data.url) window.location.href = data.url;
 }
 
 export function PricingSection() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -32,10 +34,10 @@ export function PricingSection() {
             visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
         >
-          One payment. Automated delivery. You only handle the exceptions.
+          One payment. Instant delivery. No retainers.
         </h2>
         <p className="mt-4 max-w-xl text-[var(--muted)]">
-          Customers check out, fill a short brief, and receive a complete brand kit. Your job is design taste and the occasional question.
+          Pick a kit, check out, answer a short brief, and Meridian delivers. You stay free for design taste and exceptions.
         </p>
 
         <label className="mt-8 flex max-w-md flex-col gap-2 text-sm text-[var(--muted)]">
@@ -45,9 +47,10 @@ export function PricingSection() {
             onChange={(e) => setEmail(e.target.value)}
             type="email"
             placeholder="you@company.com"
-            className="rounded-sm border border-[var(--line)] bg-white px-3 py-2 text-[var(--ink)] outline-none ring-[var(--sea)] focus:ring-2"
+            className="rounded-sm border border-[var(--line)] bg-white px-3 py-2.5 text-[var(--ink)] outline-none ring-[var(--sea)] focus:ring-2"
           />
         </label>
+        {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">
           {Object.values(PLANS).map((plan, i) => (
@@ -59,7 +62,7 @@ export function PricingSection() {
               style={{ transitionDelay: `${120 + i * 90}ms` }}
             >
               {plan.highlighted ? (
-                <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[var(--sea)]">Most automated leverage</p>
+                <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[var(--sea)]">Best for launches</p>
               ) : null}
               <h3 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">{plan.name}</h3>
               <p className="mt-2 font-[family-name:var(--font-display)] text-4xl text-[var(--ink)]">{plan.priceLabel}</p>
@@ -67,7 +70,7 @@ export function PricingSection() {
               <ul className="mt-6 space-y-2 text-sm text-[var(--ink)]/80">
                 {plan.features.map((f) => (
                   <li key={f} className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--sea)]" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--sea)]" />
                     {f}
                   </li>
                 ))}
@@ -77,8 +80,11 @@ export function PricingSection() {
                 disabled={loading === plan.id}
                 onClick={async () => {
                   setLoading(plan.id);
+                  setError(null);
                   try {
                     await startCheckout(plan, email || undefined);
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Checkout failed");
                   } finally {
                     setLoading(null);
                   }
