@@ -103,7 +103,9 @@ export async function POST(req: Request) {
 
   return NextResponse.json({
     orderId: updated.id,
+    planId: updated.planId,
     kitUrl,
+    kit,
     email: emailResult,
   });
 }

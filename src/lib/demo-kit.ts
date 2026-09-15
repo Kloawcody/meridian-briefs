@@ -17,7 +17,7 @@ export function buildDemoKit(intake: Intake, planId: PlanId): BrandKit {
   const accent = hsl((hue + 160) % 360, 48, 46);
 
   const kit: BrandKit = {
-    positioningStatement: `${intake.businessName} helps ${intake.audience} ${intake.offer} — without the usual ${intake.industry} friction — by ${intake.differentiator}.`,
+    positioningStatement: `${intake.businessName} helps ${intake.audience} get ${intake.offer} — without the usual ${intake.industry} friction — by leaning on ${intake.differentiator}.`,
     taglines: [
       `${intake.businessName}: clearer from first glance.`,
       `Built for ${intake.audience} who want ${intake.offer}.`,
